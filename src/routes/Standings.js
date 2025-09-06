@@ -10,103 +10,127 @@ const StandingsContainer = () => {
   const [error, setError] = useState(null);
   const [teamAverages, setTeamAverages] = useState([]);
   const [lastUpdated, setLastUpdated] = useState();
-  const [expandedTeams, setExpandedTeams] = useState({}); 
+  const [expandedTeams, setExpandedTeams] = useState({});
   const [allTime, setallTime] = useState(true);
 
   // Team data
   const teams = {
-    "Nakli Barca": [
-      "Koustav Bhattacharyya",
-      "Shreyansh Srivastava",
-      "Soumik Datta",
-      "Sahil Dhawan",
-      "Hashim Salim",
-      "Abhilash Pani",
+    "Dunder Mifflin": [
+      "aninda ghosh",
+      "Rishabh Mishra",
+      "Varad Terdal",
+      "Goutam Choudhury",
+      "Yashaswee Raman",
     ],
-
-    "G Town Dawgz": [
-      "Saswat Biswas",
+    "Besan Mount": [
       "Aaryak Garg",
+      "Sahil Dhawan",
+      "Aryan Khosla",
+      "Pranav Arora",
+      "Ishaan sindhu",
+    ],
+    "Inter City Firm": [
+      "Parminder Arneja",
+      "Sidharth Khajuria",
+      "chandra choudhury",
+      "Vipin Balagopalan",
+      "Anish Pradeep",
+      "amandeep singh arneja",
+    ],
+    "Gathbandhan FC": [
+      "Dhruv Jain",
+      "Rishi Kumar Rai",
+      "Vasu Pal",
+      "Aaryan Agrohi",
+      "Shyamal Jain",
+      "Amrutanshu Tyagi",
+    ],
+    "East Bengal Ultras": [
+      "Saswat Biswas",
+      "Sourobrata Dhar",
+      "Saksham Singh",
+      "Soumik Datta",
+      "Shouvik Mandal",
+    ],
+    "BenchDawgs FC": [
       "Sambhu Nair",
       "Rohit Gupta",
-      "Pranav Arora",
-      "Aryan Khosla",
-    ],
-
-    "Straw Hat FC": [
-      "Aditya Garg", 
-      "Mahi G", 
-      "Ujjval Chopra", 
-      "Kevin Joseph", 
-      "Ishaan sindhu",
-      "Lovely Chopra",
-    ],
-
-    "Gathbandhan FC": [
-      "Harsh Kumar", 
-      "Rishi Kumar Rai", 
-      "Vasu Pal", 
-      "Shyamal Jain", 
-      "Amrutanshu Tyagi", 
-      "Dhruv Jain"
-    ],
-
-    "Besharam Behaya David De Gea": [
-      "Saksham Singh", 
-      "Romil Jaitly", 
-      "Kushagra .", 
-      "Saksham Tyagi", 
-      "Jayant Tokas", 
-      "Vatsal Garg"
-    ],
-
-    "Dunder Mifflin": [
-      "Yashaswee Raman", 
-      "Goutam Choudhury", 
-      "Rishabh Mishra", 
-      "Varad Terdal", 
-      "Ashton"
-    ],
+      "Shreyas Thakur",
+      "Ujjval Chopra",
+      "Avi Pran Verma",
+      "Mohit",
+    ]
   };
 
+
   const captains = {
-    "Nakli Barca": "Koustav Bhattacharyya",
-    "G Town Dawgz": "Saswat Biswas",
-    "Straw Hat FC": "Aditya Garg",
-    "Gathbandhan FC": "Harsh Kumar",
-    "Besharam Behaya David De Gea": "Saksham Singh",
-    "Dunder Mifflin": "Yashaswee Raman",
+    "Dunder Mifflin": "aninda ghosh",
+    "Besan Mount": "Aaryak Garg",
+    "Inter City Firm": "Parminder Arneja",
+    "Gathbandhan FC": "Dhruv Jain",
+    "East Bengal Ultras": "Saswat Biswas",
+    "BenchDawgs FC": "Sambhu Nair",
   };
 
 
   useEffect(() => {
-    const fetchStandings = async () => {
+    const fetchAllStandings = async () => {
       try {
-        const response = await axios.get(
-          "/api/leagues-classic/1453054/standings/?page_new_entries=1&page_standings=1&phase=1"
-        );
-        console.log(response.data);
-        setStandings(response.data.standings.results);
-        calculateTeamAverages(response.data.standings.results, "allTime");
-        setLoading(false);
-        const date = new Date(response.data.last_updated_data);
-        setLastUpdated(
-          date.toLocaleDateString("en-US", {
-            weekday: "short",
-            day: "2-digit",
-            month: "short",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          }) + " (local time)"
-        );
+        let allResults = [];
+        let hasNextPage = true;
+        let currentPage = 1;
+        let lastUpdatedTime = null;
+
+        console.log("Starting to fetch all standings pages...");
+
+        while (hasNextPage) {
+          const response = await axios.get(`/api/leagues-classic/1690575/standings/?page_new_entries=1&page_standings=${currentPage}&phase=1`);
+          const data = response.data;
+          
+          if(data && data.standings && data.standings.results) {
+            allResults = [...allResults, ...data.standings.results];
+            hasNextPage = data.standings.has_next;
+            
+            if (!lastUpdatedTime) {
+                lastUpdatedTime = data.last_updated_data;
+            }
+
+            console.log(`Fetched page ${currentPage}. More pages? ${hasNextPage}`);
+            currentPage++;
+          } else {
+            hasNextPage = false;
+            console.warn("Unexpected API response format. Stopping pagination.");
+          }
+        }
+
+        console.log(`Finished fetching. Total entries: ${allResults.length}`);
+        
+        setStandings(allResults);
+        calculateTeamAverages(allResults, "allTime");
+        
+        if (lastUpdatedTime) {
+            const date = new Date(lastUpdatedTime);
+            setLastUpdated(
+              date.toLocaleDateString("en-US", {
+                weekday: "short",
+                day: "2-digit",
+                month: "short",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              }) + " (local time)"
+            );
+        }
+
       } catch (err) {
+        console.error("Failed to fetch standings:", err);
         setError("Failed to fetch standings");
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchStandings();
+    fetchAllStandings();
   }, []);
 
   const calculateTeamAverages = (standingsData, mode) => {
