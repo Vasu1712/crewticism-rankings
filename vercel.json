@@ -1,9 +1,8 @@
 {
-    "rewrites": [
-      {
-        "source": "/api/:match*",
-        "destination": "/api/:match*"
-      }
-    ]
-  }
-  
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://fantasy.premierleague.com/api/:path*"
+    }
+  ]
+}
