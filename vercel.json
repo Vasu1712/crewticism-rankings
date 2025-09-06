@@ -1,7 +1,7 @@
 {
   "rewrites": [
     {
-      "source": "/api/:path*",
+      "source": "/fpl/:path*",
       "destination": "https://fantasy.premierleague.com/api/:path*"
     }
   ]
