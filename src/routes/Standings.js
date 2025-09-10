@@ -84,7 +84,7 @@ const StandingsContainer = () => {
         console.log("Starting to fetch all standings pages...");
 
         while (hasNextPage) {
-          const response = await axios.get(`https://codvit-api.vercel.app/api/fpl`);
+          const response = await axios.get(`https://wol-backend.vercel.app/api/fpl`);
           const data = response.data;
           
           if(data && data.standings && data.standings.results) {
