@@ -84,7 +84,7 @@ const StandingsContainer = () => {
         console.log("Starting to fetch all standings pages...");
 
         while (hasNextPage) {
-          const response = await axios.get(`https://fantasy.premierleague.com/api/leagues-classic/1690575/standings/?page_new_entries=1&page_standings=${currentPage}&phase=1`);
+          const response = await axios.get(`https://codvit-api.vercel.app/api/fpl`);
           const data = response.data;
           
           if(data && data.standings && data.standings.results) {
