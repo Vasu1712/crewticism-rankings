@@ -84,9 +84,7 @@ const StandingsContainer = () => {
         console.log("Starting to fetch all standings pages...");
 
         while (hasNextPage) {
-          const response = await axios.get(`/api/leagues-classic/1690575/standings`, {
-            params: { page_new_entries: 1, page_standings: currentPage, phase: 1 }
-          });
+          const response = await axios.get(`/api/leagues-classic/1690575/standings/?page_new_entries=1&page_standings=${currentPage}&phase=1`);
           const data = response.data;
           
           if(data && data.standings && data.standings.results) {
