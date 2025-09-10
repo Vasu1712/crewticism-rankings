@@ -1,7 +1,8 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
-      "source": "/fpl/:path*",
+      "source": "/api/:path*",
       "destination": "https://fantasy.premierleague.com/api/:path*"
     }
   ]
